@@ -282,6 +282,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     status_reason = models.ForeignKey(InsureeStatusReason, models.DO_NOTHING, db_column='StatusReason',
                                       blank=True, null=True, related_name='insurees')
     audit_user_id = models.IntegerField(db_column='AuditUserID')
+    kebele_id = models.CharField(db_column='KebeleID', max_length=100, null=True)
     # row_id = models.BinaryField(db_column='RowID', blank=True, null=True)
 
     def is_head_of_family(self):
