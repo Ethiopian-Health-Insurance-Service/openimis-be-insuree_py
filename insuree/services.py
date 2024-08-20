@@ -150,6 +150,7 @@ def reset_insuree_before_update(insuree):
     insuree.offline = None
     insuree.json_ext = None
     insuree.kebele_id = None
+    insuree.national_id = None
 
 
 def reset_family_before_update(family):
