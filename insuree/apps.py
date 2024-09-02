@@ -59,6 +59,7 @@ class InsureeConfig(AppConfig):
     gql_mutation_update_insurees_perms = []
     gql_mutation_delete_insurees_perms = []
     validation_code_taken_insuree_number = None
+    validation_code_taken_insuree_national_id = None
     validation_code_no_insuree_number = None
     validation_code_invalid_insuree_number_len = None
     validation_code_invalid_insuree_number_checksum = None
