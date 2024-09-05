@@ -108,6 +108,14 @@ def validate_insuree_number(insuree_number, insuree_uuid=None):
                      "message": "Insuree number validation failed"}]
     return []
 
+def validate_national_id(insuree_national_id, insuree_uuid=None):
+    query = Insuree.objects.filter(
+        national_id=insuree_national_id, validity_to__isnull=True)
+    insuree = query.first()
+    if insuree_uuid and insuree and uuid.UUID(insuree.uuid) != uuid.UUID(insuree_uuid):
+        return [{"errorCode": InsureeConfig.validation_code_taken_insuree_national_id,
+                 "message": "Insuree national id has to be unique, %s exists in system" % insuree_national_id}]
+    return []
 
 def is_modulo_10_number_valid(insuree_number: str) -> bool:
     """
@@ -274,7 +282,10 @@ def validate_insuree(insuree):
         - If InsureeConfig.insuree_as_worker is True, the function performs worker data validation.
         - If InsureeConfig.insuree_as_worker is False, the function performs insuree data validation.
     """
-    errors = validate_insuree_number(insuree.chf_id, insuree.uuid)
+    errors = (
+            validate_insuree_number(insuree.chf_id, insuree.uuid) or
+            validate_national_id(insuree.national_id, insuree.uuid)
+    )
     if errors:
         raise ValidationError("invalid_insuree_number")
 
