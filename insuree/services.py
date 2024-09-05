@@ -304,7 +304,7 @@ class InsureeService:
         photo_data = data.pop('photo', None)
         from core import datetime
         now = datetime.datetime.now()
-        data['audit_user_id'] = 1 #self.user.id_for_audit
+        data['audit_user_id'] = self.user.id_for_audit
         data['validity_from'] = now
         status = data.get('status', InsureeStatus.ACTIVE)
         if status not in [choice[0] for choice in InsureeStatus.choices]:
