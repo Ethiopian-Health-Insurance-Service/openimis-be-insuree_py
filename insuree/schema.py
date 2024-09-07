@@ -119,6 +119,20 @@ class Query(ExportableQueryMixin, graphene.ObjectType):
         description="Checks that the specified insuree number is valid"
     )
 
+    is_unique_national_id = graphene.Field(
+        graphene.String,
+        national_id=graphene.String(required=True),
+        description="Checks that there national_id is unique"
+    )
+
+    def resolve_is_unique_national_id(self, info, **kwargs):
+        national_id = kwargs.get('national_id')
+        national_id_exist = Insuree.objects.filter(
+            national_id=national_id,
+        ).exists()
+        print("national_id_exist ", national_id_exist)
+        return False if national_id_exist else True
+
     def resolve_insuree_number_validity(self, info, **kwargs):
         if not info.context.user.has_perms(InsureeConfig.gql_query_insurees_perms):
             raise PermissionDenied(_("unauthorized"))

@@ -59,6 +59,8 @@ class InsureeBase:
     status_date = graphene.Date(required=False)
     kebele_id = graphene.String(required=False)
     national_id = graphene.String(required=False)
+    employment_type = graphene.String(required=False)
+    remarks = graphene.String(required=False)
 
 
 class CreateInsureeInputType(InsureeBase, OpenIMISMutation.Input):
