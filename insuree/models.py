@@ -285,6 +285,8 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     kebele_id = models.CharField(db_column='KebeleID', max_length=100, blank=True, null=True)
     national_id = models.CharField(db_column='NationalID', max_length=100, blank=True, null=True)
     # row_id = models.BinaryField(db_column='RowID', blank=True, null=True)
+    employment_type = models.CharField(db_column='EmployerType', max_length=128, blank=True, null=True)
+    remarks = models.CharField(db_column='Remarks', max_length=500, blank=True, null=True)
 
     def is_head_of_family(self):
         return self.family and self.family.head_insuree == self
