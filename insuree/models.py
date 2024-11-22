@@ -10,7 +10,7 @@ from graphql import ResolveInfo
 from insuree.apps import InsureeConfig
 from location import models as location_models
 from location.models import LocationManager
-
+from django.utils import timezone as django_tz
 
 class Gender(models.Model):
     code = models.CharField(db_column='Code', primary_key=True, max_length=1)
@@ -98,21 +98,23 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
         location_models.Location,
         models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
     poverty = models.BooleanField(db_column='Poverty', blank=True, null=True)
-    family_type = models.ForeignKey(
-        FamilyType, models.DO_NOTHING, db_column='FamilyType', blank=True, null=True,
-        related_name='families')
+    # family_type = models.ForeignKey(
+    #     FamilyType, models.DO_NOTHING, db_column='FamilyType', blank=True, null=True,
+    #     related_name='families')
     address = models.CharField(
         db_column='FamilyAddress', max_length=200, blank=True, null=True)
+    household_address = models.CharField(
+        db_column='HouseholdAddress', max_length=200, blank=True, null=True)
     is_offline = models.BooleanField(
         db_column='isOffline', blank=True, null=True)
     ethnicity = models.CharField(
         db_column='Ethnicity', max_length=1, blank=True, null=True)
-    confirmation_no = models.CharField(
-        db_column='ConfirmationNo', max_length=12, blank=True, null=True)
-    confirmation_type = models.ForeignKey(
-        ConfirmationType,
-        models.DO_NOTHING, db_column='ConfirmationType', blank=True, null=True,
-        related_name='families')
+    # confirmation_no = models.CharField(
+    #     db_column='ConfirmationNo', max_length=12, blank=True, null=True)
+    # confirmation_type = models.ForeignKey(
+    #     ConfirmationType,
+    #     models.DO_NOTHING, db_column='ConfirmationType', blank=True, null=True,
+    #     related_name='families')
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True)
 
@@ -198,6 +200,34 @@ class Relation(models.Model):
         managed = True
         db_table = 'tblRelations'
 
+class InsureeAttachment(models.Model):
+    """ Class Attachment :
+    Class for isurees attachments
+    """
+    idAttachment = models.AutoField(
+        primary_key=True, db_column='idAttachment'
+    )
+    folder = models.CharField(db_column='Folder', max_length=250, null=True)
+    filename = models.CharField(db_column='FileName', max_length=250, null=True)
+    title = models.CharField(db_column='Title', max_length=250, null=True)
+    insuree = models.ForeignKey(
+        'Insuree',
+        models.DO_NOTHING,
+        db_column='InsureeID',
+        related_name="attachments"
+    )
+    date = core.fields.DateField(db_column='AttachmentDate',
+        null=True, blank=True
+    )
+    document = models.TextField(blank=False, null=False)
+    mime = models.CharField(db_column='Mime', max_length=250, null=False)
+
+    """ Class Meta :
+    Class Meta to define specific table
+    """
+
+    class Meta:
+        db_table = "tblattachment"
 
 class InsureeStatus(models.TextChoices):
     ACTIVE = "AC"
@@ -287,6 +317,10 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     # row_id = models.BinaryField(db_column='RowID', blank=True, null=True)
     employment_type = models.CharField(db_column='EmployerType', max_length=128, blank=True, null=True)
     remarks = models.CharField(db_column='Remarks', max_length=500, blank=True, null=True)
+    address = models.CharField(
+        db_column='FamilyAddress', max_length=200, blank=True, null=True)
+    household_address = models.CharField(
+        db_column='HouseholdAddress', max_length=200, blank=True, null=True)
 
     def is_head_of_family(self):
         return self.family and self.family.head_insuree == self

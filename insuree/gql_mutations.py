@@ -25,6 +25,14 @@ class PhotoInputType(InputObjectType):
     filename = graphene.String(required=False)
     folder = graphene.String(required=False)
 
+class AttachmentInputType(InputObjectType):
+    idAttachment = graphene.Int(required=False, read_only=True)
+    folder = graphene.String(required=False)
+    title = graphene.String(required=False)
+    mime = graphene.String(required=False)
+    filename = graphene.String(required=False)
+    date = graphene.Date(required=False)
+    document = graphene.String(required=True) 
 
 class InsureeBase:
     id = graphene.Int(required=False, read_only=True)
@@ -45,6 +53,7 @@ class InsureeBase:
     photo_id = graphene.Int(required=False)
     photo_date = graphene.Date(required=False)
     photo = graphene.Field(PhotoInputType, required=False)
+    attachments = graphene.List(AttachmentInputType, required=True)
     card_issued = graphene.Boolean(required=False)
     family_id = graphene.Int(required=False)
     relationship_id = graphene.Int(required=False)
@@ -61,6 +70,8 @@ class InsureeBase:
     national_id = graphene.String(required=False)
     employment_type = graphene.String(required=False)
     remarks = graphene.String(required=False)
+    address = graphene.String(max_length=200, required=False)
+    household_address = graphene.String(max_length=200, required=False)
 
 
 class CreateInsureeInputType(InsureeBase, OpenIMISMutation.Input):
@@ -80,12 +91,13 @@ class FamilyBase:
     uuid = graphene.String(required=False)
     location_id = graphene.Int(required=False)
     poverty = graphene.Boolean(required=False)
-    family_type_id = graphene.String(max_length=1, required=False)
+    # family_type_id = graphene.String(max_length=1, required=False)
     address = graphene.String(max_length=200, required=False)
+    household_address = graphene.String(max_length=200, required=False)
     is_offline = graphene.Boolean(required=False)
     ethnicity = graphene.String(max_length=1, required=False)
-    confirmation_no = graphene.String(max_length=12, required=False)
-    confirmation_type_id = graphene.String(max_length=3, required=False)
+    # confirmation_no = graphene.String(max_length=12, required=False)
+    # confirmation_type_id = graphene.String(max_length=3, required=False)
     json_ext = graphene.types.json.JSONString(required=False)
 
     contribution = graphene.types.json.JSONString(required=False)

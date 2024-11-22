@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 
 from core.signals import register_service_signal
 from insuree.apps import InsureeConfig
-from insuree.models import (InsureePhoto, PolicyRenewalDetail, Insuree, Family, InsureePolicy, InsureeStatus,
+from insuree.models import (InsureePhoto, InsureeAttachment, PolicyRenewalDetail, Insuree, Family, InsureePolicy, InsureeStatus,
                             InsureeStatusReason)
 from django.core.exceptions import ValidationError
 from core.models import filter_validity, resolved_id_reference
@@ -161,17 +161,20 @@ def reset_insuree_before_update(insuree):
     insuree.national_id = None
     insuree.employment_type = None
     insuree.remarks = None
+    insuree.address = None
+    insuree.household_address = None
 
 
 def reset_family_before_update(family):
     family.location = None
     family.poverty = None
-    family.family_type = None
+    # family.family_type = None
     family.address = None
+    family.household_address = None
     family.is_offline = None
     family.ethnicity = None
-    family.confirmation_no = None
-    family.confirmation_type = None
+    # family.confirmation_no = None
+    # family.confirmation_type = None
     family.json_ext = None
 
 
@@ -206,6 +209,16 @@ def handle_insuree_photo(user, now, insuree, data):
         insuree_photo.save()
     return insuree_photo
 
+def handle_insuree_attachments(user, now, insuree, data):
+    data['insuree_id'] = insuree.id
+    document_bin = data.get('document', None)
+    if document_bin and InsureeConfig.insuree_photos_root_path:
+        (file_dir, file_name) = create_file(now, insuree.id, document_bin)
+        data['folder'] = file_dir
+        data['filename'] = file_name
+    insuree_attachment = InsureeAttachment.objects.create(**data)
+    insuree_attachment.save()
+    return insuree_attachment
 
 def photo_changed(insuree_photo, data):
     return (not insuree_photo and data) or \
@@ -331,7 +344,7 @@ class InsureeService:
             raise ValidationError("mutation.insuree.fsp_required")
 
         insuree = Insuree(**data)
-        return self._create_or_update(insuree, photo_data)
+        return self._create_or_update(insuree, photo_data, data)
 
     def disable_policies_of_insuree(self, insuree, status_date):
         policies_to_cancel = InsureePolicy.objects.filter(insuree=insuree.id, validity_to__isnull=True).all()
@@ -353,8 +366,11 @@ class InsureeService:
                 current_policy = InsureePolicy(**current_policy_dict)
                 current_policy.save()
 
-    def _create_or_update(self, insuree, photo_data=None):
+    def _create_or_update(self, insuree, data=None, photo_data=None):
         validate_insuree(insuree)
+        attachments = data.pop('attachments', []) if data else None
+        from core import datetime
+        now = datetime.datetime.now()
         if insuree.id:
             filters = Q(id=insuree.id)
             # remove it from now3 to avoid id at creation
@@ -375,6 +391,13 @@ class InsureeService:
                 insuree.photo = photo
                 insuree.photo_date = photo.date
                 insuree.save()
+        InsureeAttachment.objects.filter(
+            insuree_id=insuree.id
+        ).delete()
+        for attachment in attachments:
+            handle_insuree_attachments(
+                self.user, now, insuree, attachment
+            )
         return insuree
 
     def remove(self, insuree):
