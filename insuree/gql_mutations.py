@@ -53,7 +53,7 @@ class InsureeBase:
     photo_id = graphene.Int(required=False)
     photo_date = graphene.Date(required=False)
     photo = graphene.Field(PhotoInputType, required=False)
-    attachments = graphene.List(AttachmentInputType, required=True)
+    attachments = graphene.List(AttachmentInputType, required=False)
     card_issued = graphene.Boolean(required=False)
     family_id = graphene.Int(required=False)
     relationship_id = graphene.Int(required=False)
@@ -70,8 +70,8 @@ class InsureeBase:
     national_id = graphene.String(required=False)
     employment_type = graphene.String(required=False)
     remarks = graphene.String(required=False)
-    address = graphene.String(max_length=200, required=False)
-    household_address = graphene.String(max_length=200, required=False)
+    household_location_id = graphene.Int(required=False)
+
 
 
 class CreateInsureeInputType(InsureeBase, OpenIMISMutation.Input):
@@ -90,10 +90,10 @@ class FamilyBase:
     id = graphene.Int(required=False, read_only=True)
     uuid = graphene.String(required=False)
     location_id = graphene.Int(required=False)
+    household_location_id = graphene.Int(required=False)
     poverty = graphene.Boolean(required=False)
     # family_type_id = graphene.String(max_length=1, required=False)
     address = graphene.String(max_length=200, required=False)
-    household_address = graphene.String(max_length=200, required=False)
     is_offline = graphene.Boolean(required=False)
     ethnicity = graphene.String(max_length=1, required=False)
     # confirmation_no = graphene.String(max_length=12, required=False)

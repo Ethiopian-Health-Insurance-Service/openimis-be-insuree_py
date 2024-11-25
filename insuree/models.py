@@ -97,14 +97,15 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
     location = models.ForeignKey(
         location_models.Location,
         models.DO_NOTHING, db_column='LocationId', blank=True, null=True)
+    household_location = models.ForeignKey(
+        location_models.Location,
+        models.DO_NOTHING, db_column='HouseholdLocationId', related_name='household_families', blank=True, null=True)
     poverty = models.BooleanField(db_column='Poverty', blank=True, null=True)
     # family_type = models.ForeignKey(
     #     FamilyType, models.DO_NOTHING, db_column='FamilyType', blank=True, null=True,
     #     related_name='families')
     address = models.CharField(
         db_column='FamilyAddress', max_length=200, blank=True, null=True)
-    household_address = models.CharField(
-        db_column='HouseholdAddress', max_length=200, blank=True, null=True)
     is_offline = models.BooleanField(
         db_column='isOffline', blank=True, null=True)
     ethnicity = models.CharField(
@@ -255,6 +256,9 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     chf_id = models.CharField(db_column='CHFID', max_length=50, blank=True, null=True)
     last_name = models.CharField(db_column='LastName', max_length=100)
     other_names = models.CharField(db_column='OtherNames', max_length=100)
+    household_location = models.ForeignKey(
+        location_models.Location,
+        models.DO_NOTHING, db_column='HouseholdLocationId',related_name='household_insurees', blank=True, null=True)
 
     gender = models.ForeignKey(Gender, models.DO_NOTHING, db_column='Gender', blank=True, null=True,
                                related_name='insurees')
@@ -317,10 +321,6 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     # row_id = models.BinaryField(db_column='RowID', blank=True, null=True)
     employment_type = models.CharField(db_column='EmployerType', max_length=128, blank=True, null=True)
     remarks = models.CharField(db_column='Remarks', max_length=500, blank=True, null=True)
-    address = models.CharField(
-        db_column='FamilyAddress', max_length=200, blank=True, null=True)
-    household_address = models.CharField(
-        db_column='HouseholdAddress', max_length=200, blank=True, null=True)
 
     def is_head_of_family(self):
         return self.family and self.family.head_insuree == self

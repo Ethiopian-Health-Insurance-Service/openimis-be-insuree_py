@@ -161,8 +161,8 @@ def reset_insuree_before_update(insuree):
     insuree.national_id = None
     insuree.employment_type = None
     insuree.remarks = None
-    insuree.address = None
-    insuree.household_address = None
+    insuree.household_location = None
+    # insuree.household_address = None
 
 
 def reset_family_before_update(family):
@@ -170,7 +170,7 @@ def reset_family_before_update(family):
     family.poverty = None
     # family.family_type = None
     family.address = None
-    family.household_address = None
+    family.household_location = None
     family.is_offline = None
     family.ethnicity = None
     # family.confirmation_no = None
