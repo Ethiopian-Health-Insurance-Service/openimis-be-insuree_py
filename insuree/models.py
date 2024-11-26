@@ -107,12 +107,6 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
         db_column='isOffline', blank=True, null=True)
     ethnicity = models.CharField(
         db_column='Ethnicity', max_length=1, blank=True, null=True)
-    # confirmation_no = models.CharField(
-    #     db_column='ConfirmationNo', max_length=12, blank=True, null=True)
-    # confirmation_type = models.ForeignKey(
-    #     ConfirmationType,
-    #     models.DO_NOTHING, db_column='ConfirmationType', blank=True, null=True,
-    #     related_name='families')
     audit_user_id = models.IntegerField(db_column='AuditUserID')
     # rowid = models.TextField(db_column='RowID', blank=True, null=True)
 
