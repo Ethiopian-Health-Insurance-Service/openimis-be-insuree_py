@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 
 from .apps import InsureeConfig
-from .models import Insuree, InsureePhoto, Education, Profession, Gender, IdentificationType, \
+from .models import Insuree, InsureePhoto, Education, Profession, Gender, InsureeAttachment, IdentificationType, \
     Family, FamilyType, ConfirmationType, Relation, InsureePolicy, FamilyMutation, InsureeMutation, InsureeStatusReason
 from location.schema import LocationGQLType
 from policy.gql_queries import PolicyGQLType
@@ -39,6 +39,21 @@ class PhotoGQLType(DjangoObjectType):
             "id": ["exact"]
         }
 
+class AttachmentGQLType(DjangoObjectType):
+    document = graphene.String()
+
+    def resolve_attachment(self, info):
+        if self.document:
+            return self.document
+        elif InsureeConfig.insuree_photos_root_path and self.folder and self.filename:
+            return load_photo_file(self.folder, self.filename)
+        return None
+
+    class Meta:
+        model = InsureeAttachment
+        filter_fields = {
+            "id": ["exact"]
+        }
 
 class IdentificationTypeGQLType(DjangoObjectType):
     class Meta:
@@ -117,6 +132,14 @@ class InsureeGQLType(DjangoObjectType):
                 self.current_village_id
             )
         return self.current_village
+    
+    def resolve_household_location(self, info):
+        if not info.context.user.has_perms(InsureeConfig.gql_query_insuree_perms):
+            raise PermissionDenied(_("unauthorized"))
+        if not self.household_location_id:
+            return None
+        if "location_loader" in info.context.dataloaders:
+            return info.context.dataloaders["location_loader"].load(self.household_location_id)
 
     def resolve_family(self, info):
         if not info.context.user.has_perms(InsureeConfig.gql_query_insuree_perms):
@@ -159,7 +182,8 @@ class InsureeGQLType(DjangoObjectType):
             **prefix_filterset("photo__", PhotoGQLType._meta.filter_fields),
             "photo": ["isnull"],
             "family": ["isnull"],
-            **prefix_filterset("gender__", GenderGQLType._meta.filter_fields)
+            **prefix_filterset("gender__", GenderGQLType._meta.filter_fields),
+            **prefix_filterset("household_location__", LocationGQLType._meta.filter_fields)
         }
         interfaces = (graphene.relay.Node,)
         connection_class = ExtendedConnection
@@ -184,6 +208,14 @@ class FamilyGQLType(DjangoObjectType):
             raise PermissionDenied(_("unauthorized"))
         if "location_loader" in info.context.dataloaders:
             return info.context.dataloaders["location_loader"].load(self.location_id)
+        
+    def resolve_household_location(self, info):
+        if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
+            raise PermissionDenied(_("unauthorized"))
+        if not self.household_location_id:
+            return None
+        if "location_loader" in info.context.dataloaders:
+            return info.context.dataloaders["location_loader"].load(self.household_location_id)
 
     def resolve_head_insuree(self, info):
         if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
@@ -196,13 +228,11 @@ class FamilyGQLType(DjangoObjectType):
         filter_fields = {
             "uuid": ["exact","iexact"],
             "poverty": ["exact", "isnull"],
-            "confirmation_no": ["exact", "istartswith", "icontains", "iexact"],
-            "confirmation_type": ["exact"],
-            "family_type": ["exact"],
             "address": ["exact", "istartswith", "icontains", "iexact"],
             "ethnicity": ["exact"],
             "is_offline": ["exact"],
             **prefix_filterset("location__", LocationGQLType._meta.filter_fields),
+            **prefix_filterset("household_location__", LocationGQLType._meta.filter_fields),
             **prefix_filterset("head_insuree__", InsureeGQLType._meta.filter_fields),
             **prefix_filterset("members__", InsureeGQLType._meta.filter_fields)
         }
