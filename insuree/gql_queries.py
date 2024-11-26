@@ -228,9 +228,6 @@ class FamilyGQLType(DjangoObjectType):
         filter_fields = {
             "uuid": ["exact","iexact"],
             "poverty": ["exact", "isnull"],
-            # "confirmation_no": ["exact", "istartswith", "icontains", "iexact"],
-            # "confirmation_type": ["exact"],
-            # "family_type": ["exact"],
             "address": ["exact", "istartswith", "icontains", "iexact"],
             "ethnicity": ["exact"],
             "is_offline": ["exact"],

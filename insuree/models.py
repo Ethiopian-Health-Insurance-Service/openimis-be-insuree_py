@@ -101,9 +101,6 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
         location_models.Location,
         models.DO_NOTHING, db_column='HouseholdLocationId', related_name='household_families', blank=True, null=True)
     poverty = models.BooleanField(db_column='Poverty', blank=True, null=True)
-    # family_type = models.ForeignKey(
-    #     FamilyType, models.DO_NOTHING, db_column='FamilyType', blank=True, null=True,
-    #     related_name='families')
     address = models.CharField(
         db_column='FamilyAddress', max_length=200, blank=True, null=True)
     is_offline = models.BooleanField(

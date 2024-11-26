@@ -92,12 +92,9 @@ class FamilyBase:
     location_id = graphene.Int(required=False)
     household_location_id = graphene.Int(required=False)
     poverty = graphene.Boolean(required=False)
-    # family_type_id = graphene.String(max_length=1, required=False)
     address = graphene.String(max_length=200, required=False)
     is_offline = graphene.Boolean(required=False)
     ethnicity = graphene.String(max_length=1, required=False)
-    # confirmation_no = graphene.String(max_length=12, required=False)
-    # confirmation_type_id = graphene.String(max_length=3, required=False)
     json_ext = graphene.types.json.JSONString(required=False)
 
     contribution = graphene.types.json.JSONString(required=False)

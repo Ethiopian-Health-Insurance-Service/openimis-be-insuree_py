@@ -82,8 +82,6 @@ class Query(ExportableQueryMixin, graphene.ObjectType):
     identification_types = graphene.List(IdentificationTypeGQLType)
     educations = graphene.List(EducationGQLType)
     professions = graphene.List(ProfessionGQLType)
-    # family_types = graphene.List(FamilyTypeGQLType)
-    # confirmation_types = graphene.List(ConfirmationTypeGQLType)
     relations = graphene.List(RelationGQLType)
     insuree_status_reasons = DjangoFilterConnectionField(
         InsureeStatusReasonGQLType,
@@ -235,20 +233,10 @@ class Query(ExportableQueryMixin, graphene.ObjectType):
             raise PermissionDenied(_("unauthorized"))
         return IdentificationType.objects.order_by('sort_order').all()
 
-    # def resolve_confirmation_types(self, info, **kwargs):
-    #     if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
-    #         raise PermissionDenied(_("unauthorized"))
-    #     return ConfirmationType.objects.order_by('sort_order').all()
-
     def resolve_relations(self, info, **kwargs):
         if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
             raise PermissionDenied(_("unauthorized"))
         return Relation.objects.order_by('sort_order').all()
-
-    # def resolve_family_types(self, info, **kwargs):
-    #     if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
-    #         raise PermissionDenied(_("unauthorized"))
-    #     return FamilyType.objects.order_by('sort_order').all()
 
     def resolve_families(self, info, **kwargs):
         if not info.context.user.has_perms(InsureeConfig.gql_query_families_perms):
