@@ -71,6 +71,7 @@ class InsureeBase:
     employment_type = graphene.String(required=False)
     remarks = graphene.String(required=False)
     household_location_id = graphene.Int(required=False)
+    household_address = graphene.String(max_length=200, required=False)
 
 
 

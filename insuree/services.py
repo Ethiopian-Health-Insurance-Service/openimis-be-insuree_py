@@ -162,6 +162,7 @@ def reset_insuree_before_update(insuree):
     insuree.employment_type = None
     insuree.remarks = None
     insuree.household_location = None
+    insuree.household_address = None
 
 
 def reset_family_before_update(family):
@@ -313,6 +314,7 @@ class InsureeService:
     @register_service_signal('insuree_service.create_or_update')
     def create_or_update(self, data):
         photo_data = data.pop('photo', None)
+        attachements_data = data.pop('attachments', None)
         from core import datetime
         now = datetime.datetime.now()
         data['audit_user_id'] = self.user.id_for_audit
@@ -340,7 +342,7 @@ class InsureeService:
             raise ValidationError("mutation.insuree.fsp_required")
 
         insuree = Insuree(**data)
-        return self._create_or_update(insuree, photo_data, data)
+        return self._create_or_update(insuree, photo_data, attachements_data)
 
     def disable_policies_of_insuree(self, insuree, status_date):
         policies_to_cancel = InsureePolicy.objects.filter(insuree=insuree.id, validity_to__isnull=True).all()
@@ -362,9 +364,8 @@ class InsureeService:
                 current_policy = InsureePolicy(**current_policy_dict)
                 current_policy.save()
 
-    def _create_or_update(self, insuree, data=None, photo_data=None):
+    def _create_or_update(self, insuree, photo_data=None, attachements_data=None):
         validate_insuree(insuree)
-        attachments = data.pop('attachments', []) if data else None
         from core import datetime
         now = datetime.datetime.now()
         if insuree.id:
@@ -390,10 +391,11 @@ class InsureeService:
         InsureeAttachment.objects.filter(
             insuree_id=insuree.id
         ).delete()
-        for attachment in attachments:
-            handle_insuree_attachments(
-                self.user, now, insuree, attachment
-            )
+        if attachements_data:
+            for attachment in attachements_data:
+                handle_insuree_attachments(
+                    self.user, now, insuree, attachment
+                )
         return insuree
 
     def remove(self, insuree):

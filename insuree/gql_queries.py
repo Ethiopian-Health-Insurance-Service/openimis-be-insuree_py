@@ -179,6 +179,7 @@ class InsureeGQLType(DjangoObjectType):
             "status": ["exact"],
             "validity_from": ["exact", "lt", "lte", "gt", "gte", "isnull"],
             "validity_to": ["exact", "lt", "lte", "gt", "gte", "isnull"],
+            "household_address": ["exact", "istartswith", "icontains", "iexact"],
             **prefix_filterset("photo__", PhotoGQLType._meta.filter_fields),
             "photo": ["isnull"],
             "family": ["isnull"],
