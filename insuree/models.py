@@ -250,6 +250,8 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     household_location = models.ForeignKey(
         location_models.Location,
         models.DO_NOTHING, db_column='HouseholdLocationId',related_name='household_insurees', blank=True, null=True)
+    household_address = models.CharField(
+        db_column='HouseholdAddress', max_length=200, blank=True, null=True)
 
     gender = models.ForeignKey(Gender, models.DO_NOTHING, db_column='Gender', blank=True, null=True,
                                related_name='insurees')
