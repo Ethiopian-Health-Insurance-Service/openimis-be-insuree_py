@@ -210,7 +210,7 @@ def handle_insuree_attachments(user, now, insuree, data):
     data['insuree_id'] = insuree.id
     document_bin = data.get('document', None)
     if document_bin and InsureeConfig.insuree_photos_root_path:
-        (file_dir, file_name) = create_file(now, insuree.id, document_bin)
+        (file_dir, file_name) = create_file(now, insuree.id, document_bin, data['filename'])
         data['folder'] = file_dir
         data['filename'] = file_name
     insuree_attachment = InsureeAttachment.objects.create(**data)
